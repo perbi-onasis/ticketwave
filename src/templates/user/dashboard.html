@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Customer Dashboard</h1>
+    
+    <div class="row">
+        <!-- Quick Actions -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <div class="list-group">
+                        <a href="{{ url_for('main.events') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-calendar"></i> View Available Events
+                        </a>
+                        <a href="{{ url_for('user.my_tickets') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-ticket-alt"></i> My Tickets
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action text-danger">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Available Events</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for event in events %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ event.name }}</h5>
+                                    <p class="card-text">
+                                        <small>
+                                            <i class="fas fa-map-marker-alt"></i> {{ event.venue }}<br>
+                                            <i class="fas fa-calendar"></i> {{ event.date.strftime('%B %d, %Y') }}
+                                        </small>
+                                    </p>
+                                    <a href="{{ url_for('main.event_detail', event_id=event.id) }}" 
+                                       class="btn btn-primary btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- My Tickets -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">My Recent Tickets</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Ticket Type</th>
+                            <th>Date</th>
+                            <th>Price Paid</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.event.name }}</td>
+                            <td>{{ ticket.ticket_type.name }}</td>
+                            <td>{{ ticket.event.date.strftime('%Y-%m-%d') }}</td>
+                            <td>${{ "%.2f"|format(ticket.price_paid) }}</td>
+                            <td>
+                                <a href="{{ url_for('user.view_ticket', ticket_id=ticket.id) }}" 
+                                   class="btn btn-sm btn-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

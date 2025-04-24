@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}My Tickets{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">My Tickets</h2>
+    
+    {% if tickets %}
+    <div class="row">
+        {% for ticket in tickets %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ ticket.event.name }}</h5>
+                    <div class="ticket-details">
+                        <p class="mb-1">
+                            <strong>Ticket Type:</strong> {{ ticket.ticket_type.name }}<br>
+                            <strong>Date:</strong> {{ ticket.event.date.strftime('%B %d, %Y at %I:%M %p') }}<br>
+                            <strong>Venue:</strong> {{ ticket.event.venue }}<br>
+                            <strong>Ticket #:</strong> {{ ticket.ticket_number }}<br>
+                            <strong>Amount Paid:</strong> ₵{{ "%.2f"|format(ticket.price_paid) }}
+                            {% if ticket.used_promotion %}
+                            <br><small class="text-success">
+                                Promotion applied: {{ ticket.used_promotion.code }} 
+                                ({{ ticket.used_promotion.discount_percent }}% off)
+                            </small>
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% if ticket.event.date > now %}
+                    <div class="text-end">
+                        <a href="{{ url_for('customer.view_ticket', ticket_id=ticket.id) }}" 
+                           class="btn btn-primary btn-sm">View Ticket</a>
+                    </div>
+                    {% else %}
+                    <div class="text-muted text-end">
+                        <small>Event has passed</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        You haven't purchased any tickets yet. 
+        <a href="{{ url_for('main.events') }}">Browse available events</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

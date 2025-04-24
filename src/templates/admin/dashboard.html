@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <!-- Admin Menu -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Event Management</h5>
+                    <div class="list-group">
+                        <a href="{{ url_for('admin.create_event') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus"></i> Create New Event
+                        </a>
+                        <a href="{{ url_for('admin.view_events') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-calendar"></i> View All Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Ticket Management</h5>
+                    <div class="list-group">
+                        {% if events %}
+                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#selectEventModal">
+                            <i class="fas fa-ticket-alt"></i> Add Ticket Type
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('admin.sales_reports') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chart-bar"></i> View Sales Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Promotion Management</h5>
+                    <div class="list-group">
+                        {% if events %}
+                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#addPromotionModal">
+                            <i class="fas fa-percent"></i> Add Promotion
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#removePromotionModal">
+                            <i class="fas fa-trash"></i> Remove Promotion
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Selection Modal -->
+    <div class="modal fade" id="selectEventModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="list-group">
+                        {% for event in events %}
+                        <a href="{{ url_for('admin.add_ticket_type', event_id=event.id) }}" 
+                           class="list-group-item list-group-item-action">
+                            {{ event.name }} - {{ event.date.strftime('%Y-%m-%d') }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove Promotion Modal -->
+    <div class="modal fade" id="removePromotionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Remove Promotion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="list-group">
+                        {% for promotion in promotions %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {{ promotion.code }} ({{ promotion.discount_percent }}% off)<br>
+                                    <small>Event: {{ promotion.event.name }}</small>
+                                </div>
+                                <form method="POST" action="{{ url_for('admin.deactivate_promotion', promotion_id=promotion.id) }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Events</h5>
+                    <h2>{{ events|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Total Tickets</h5>
+                    <h2>{{ tickets|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Active Promotions</h5>
+                    <h2>{{ promotions|length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add this section to your existing admin dashboard -->
+    <!-- <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Pending Event Approvals</h5>
+        </div>
+        <div class="card-body">
+            {% if events %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Event Name</th>
+                            <th>Promoter</th>
+                            <th>Date</th>
+                            <th>Venue</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                        {% if event.status == 'pending' %}
+                        <tr>
+                            <td>{{ event.name }}</td>
+                            <td>{{ event.promoter }}</td>
+                            <td>{{ event.date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ event.venue }}</td>
+                            <td>
+                                <span class="badge bg-warning">Pending</span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <form method="POST" action="{{ url_for('admin.approve_event', event_id=event.id) }}" 
+                                          class="d-inline">
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('admin.reject_event', event_id=event.id) }}" 
+                                          class="d-inline ms-2">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center">No pending events to approve.</p>
+            {% endif %}
+        </div>
+    </div> -->
+</div>
+{% endblock %}

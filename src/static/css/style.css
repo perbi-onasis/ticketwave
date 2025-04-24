@@ -1,0 +1,135 @@
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Card Styles */
+.event-card {
+    transition: transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+}
+
+.event-card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: #4a90e2;
+    border-color: #4a90e2;
+}
+
+.btn-primary:hover {
+    background-color: #357abd;
+    border-color: #357abd;
+}
+
+/* Navigation */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Footer */
+.footer {
+    margin-top: 3rem;
+    padding: 2rem 0;
+}
+
+.social-links a {
+    font-size: 1.5rem;
+    transition: color 0.2s;
+    color: #fff;
+}
+
+.social-links a:hover {
+    color: #f28c38 !important;
+}
+
+/* Forms */
+.form-control:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
+
+/* Ticket Categories */
+.ticket-type {
+    border-left: 4px solid #4a90e2;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ticket-type.premium {
+    border-left-color: gold;
+}
+
+.ticket-type.vip {
+    border-left-color: purple;
+}
+
+/* Dashboard Stats */
+.stat-card {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1rem;
+}
+
+.stat-card i {
+    font-size: 2rem;
+    color: #4a90e2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .event-card img {
+        height: 150px;
+    }
+}
+
+/* Category-specific styles */
+.badge.concerts {
+    background-color: #e91e63;
+}
+
+.badge.sports {
+    background-color: #2196f3;
+}
+
+.badge.theatre {
+    background-color: #9c27b0;
+}
+
+.badge.conferences {
+    background-color: #ff9800;
+}
+
+.badge.festivals {
+    background-color: #4caf50;
+}
+
+/* Category filter buttons */
+.category-filter .btn {
+    text-transform: capitalize;
+    margin: 0.25rem;
+}

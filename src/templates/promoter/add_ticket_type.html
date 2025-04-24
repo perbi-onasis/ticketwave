@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Add Ticket Type - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Add Ticket Type for {{ event.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Ticket Category</label>
+                            <select class="form-control" id="name" name="name" required>
+                                <option value="">Select a ticket category</option>
+                                <option value="VIP">VIP</option>
+                                <option value="Regular">Regular</option>
+                                <option value="Early Bird">Early Bird</option>
+                                <option value="Student">Student</option>
+                                <option value="Group">Group</option>
+                                <option value="Premium">Premium</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"
+                                    placeholder="Describe what's included with this ticket type"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label">Price (₵)</label>
+                                <input type="number" class="form-control" id="price" name="price" 
+                                       step="0.01" min="0" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="quantity" class="form-label">Total Quantity</label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" 
+                                       min="1" required>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Add Ticket Type</button>
+                            <a href="{{ url_for('promoter.manage_tickets', event_id=event.id) }}" 
+                               class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

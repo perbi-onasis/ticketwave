@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Add Promotion - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Add Promotion for {{ event.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Promotion Code</label>
+                            <input type="text" class="form-control" name="code" required
+                                   placeholder="e.g., SUMMER2024">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Discount Percentage</label>
+                            <input type="number" class="form-control" name="discount_percent" 
+                                   required min="1" max="100" step="0.1"
+                                   placeholder="Enter discount percentage">
+                            <small class="text-muted">Enter a value between 1 and 100</small>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" name="start_date" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" name="end_date" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Terms & Conditions</label>
+                            <textarea class="form-control" name="terms_conditions" rows="3"
+                                    placeholder="Enter any terms and conditions for this promotion"></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Add Promotion</button>
+                            <a href="{{ url_for('promoter.manage_promotions', event_id=event.id) }}" 
+                               class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

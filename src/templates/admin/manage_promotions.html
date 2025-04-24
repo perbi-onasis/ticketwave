@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Promotions - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ event.name }} - Promotions</h2>
+        <a href="{{ url_for('admin.add_promotion', event_id=event.id) }}" 
+           class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Promotion
+        </a>
+    </div>
+
+    <!-- Active Promotions -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Active Promotions</h5>
+        </div>
+        <div class="card-body">
+            {% if active_promotions %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Discount</th>
+                            <th>Valid Period</th>
+                            <th>Usage</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for promo in active_promotions %}
+                        <tr>
+                            <td>
+                                <strong>{{ promo.code }}</strong>
+                                {% if promo.terms_conditions %}
+                                <br><small class="text-muted">{{ promo.terms_conditions }}</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ promo.discount_percent }}%</td>
+                            <td>
+                                {{ promo.start_date.strftime('%Y-%m-%d') }} to
+                                {{ promo.end_date.strftime('%Y-%m-%d') }}
+                            </td>
+                            <td>{{ promo.tickets|length }} uses</td>
+                            <td>
+                                <form method="POST" 
+                                      action="{{ url_for('admin.deactivate_promotion', promotion_id=promo.id) }}"
+                                      class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-warning"
+                                            onclick="return confirm('Are you sure you want to deactivate this promotion?')">
+                                        Deactivate
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center">No active promotions.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Expired Promotions -->
+    {% if expired_promotions %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Expired Promotions</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Discount</th>
+                            <th>Valid Period</th>
+                            <th>Total Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for promo in expired_promotions %}
+                        <tr class="text-muted">
+                            <td>{{ promo.code }}</td>
+                            <td>{{ promo.discount_percent }}%</td>
+                            <td>
+                                {{ promo.start_date.strftime('%Y-%m-%d') }} to
+                                {{ promo.end_date.strftime('%Y-%m-%d') }}
+                            </td>
+                            <td>{{ promo.tickets|length }} uses</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

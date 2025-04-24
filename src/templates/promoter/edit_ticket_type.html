@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Ticket Type - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Edit Ticket Type for {{ event.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Ticket Category</label>
+                            <select class="form-control" id="name" name="name" required>
+                                <option value="">Select a ticket category</option>
+                                <option value="VIP" {% if ticket_type.name == 'VIP' %}selected{% endif %}>VIP</option>
+                                <option value="Regular" {% if ticket_type.name == 'Regular' %}selected{% endif %}>Regular</option>
+                                <option value="Early Bird" {% if ticket_type.name == 'Early Bird' %}selected{% endif %}>Early Bird</option>
+                                <option value="Student" {% if ticket_type.name == 'Student' %}selected{% endif %}>Student</option>
+                                <option value="Group" {% if ticket_type.name == 'Group' %}selected{% endif %}>Group</option>
+                                <option value="Premium" {% if ticket_type.name == 'Premium' %}selected{% endif %}>Premium</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"
+                                    placeholder="Describe what's included with this ticket type">{{ ticket_type.description }}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label">Price (₵)</label>
+                                <input type="number" class="form-control" id="price" name="price" 
+                                       step="0.01" min="0" required value="{{ ticket_type.price }}">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="quantity" class="form-label">Total Quantity</label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" 
+                                       min="{{ ticket_type.quantity - ticket_type.available }}" required 
+                                       value="{{ ticket_type.quantity }}">
+                                <small class="text-muted">Minimum is current sold tickets ({{ ticket_type.quantity - ticket_type.available }})</small>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Update Ticket Type</button>
+                            <a href="{{ url_for('promoter.manage_tickets', event_id=event.id) }}" 
+                               class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

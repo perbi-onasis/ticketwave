@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    {% if current_user.is_authenticated %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Please log out to purchase tickets. Promoters and administrators cannot purchase tickets.
+        </div>
+    {% else %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>{{ event.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <p>{{ event.description }}</p>
+                    <div class="event-details mb-4">
+                        <p><i class="fas fa-calendar"></i> {{ event.date.strftime('%B %d, %Y') }}</p>
+                        <p><i class="fas fa-clock"></i> {{ event.date.strftime('%I:%M %p') }}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> {{ event.venue }}</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('user.purchase_tickets', event_id=event.id) }}" id="purchaseForm">
+                        <div class="mb-4">
+                            <h5>Your Information</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" name="guest_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="guest_email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" name="guest_phone" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5>Select Tickets</h5>
+                            {% for ticket_type in event.ticket_types %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ ticket_type.name }}</h6>
+                                            <p class="mb-1">{{ ticket_type.description }}</p>
+                                            <p class="mb-0">₵{{ "%.2f"|format(ticket_type.price) }}</p>
+                                        </div>
+                                        <div style="width: 100px;">
+                                            <input type="number" 
+                                                   class="form-control ticket-quantity" 
+                                                   name="quantity_{{ ticket_type.id }}" 
+                                                   value="0" 
+                                                   min="0" 
+                                                   max="{{ ticket_type.available }}"
+                                                   data-price="{{ ticket_type.price }}"
+                                                   {% if ticket_type.available == 0 %}disabled{% endif %}>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ ticket_type.available }} tickets available</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>Total: ₵<span id="totalAmount">0.00</span></h5>
+                            <button type="submit" class="btn btn-primary">Proceed to Payment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary Section -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div id="orderSummary">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total:</strong>
+                        <strong>₵<span id="summaryTotal">0.00</span></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% block scripts %}
+<script>
+    // Calculate and update totals
+    function updateTotals() {
+        let total = 0;
+        let summaryHtml = '';
+
+        document.querySelectorAll('.ticket-quantity').forEach(input => {
+            const quantity = parseInt(input.value) || 0;
+            const price = parseFloat(input.dataset.price);
+            const subtotal = quantity * price;
+            total += subtotal;
+
+            if (quantity > 0) {
+                const ticketName = input.closest('.card').querySelector('h6').textContent;
+                summaryHtml += `
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>${ticketName} x ${quantity}</span>
+                        <span>₵${subtotal.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+        });
+
+        document.getElementById('totalAmount').textContent = total.toFixed(2);
+        document.getElementById('summaryTotal').textContent = total.toFixed(2);
+        document.getElementById('orderSummary').innerHTML = summaryHtml;
+    }
+
+    // Add event listeners
+    document.querySelectorAll('.ticket-quantity').forEach(input => {
+        input.addEventListener('change', updateTotals);
+    });
+
+    // Initialize totals
+    updateTotals();
+</script>
+{% endblock %}
+{% endblock %} 

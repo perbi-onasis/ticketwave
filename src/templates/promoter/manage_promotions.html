@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Promotions - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Promotions: {{ event.name }}</h2>
+        <a href="{{ url_for('promoter.add_promotion', event_id=event.id) }}" 
+           class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Promotion
+        </a>
+    </div>
+
+    <!-- Active Promotions -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Active Promotions</h5>
+        </div>
+        <div class="card-body">
+            {% if active_promotions %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Discount</th>
+                            <th>Valid Until</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for promotion in active_promotions %}
+                        <tr>
+                            <td>{{ promotion.code }}</td>
+                            <td>{{ promotion.discount_amount }}%</td>
+                            <td>{{ promotion.end_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('promoter.deactivate_promotion', promotion_id=promotion.id) }}"
+                                      class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Are you sure you want to deactivate this promotion?')">
+                                        Deactivate
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No active promotions.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Past Promotions -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Past Promotions</h5>
+        </div>
+        <div class="card-body">
+            {% if past_promotions %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Discount</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for promotion in past_promotions %}
+                        <tr>
+                            <td>{{ promotion.code }}</td>
+                            <td>{{ promotion.discount_amount }}%</td>
+                            <td>{{ promotion.end_date.strftime('%Y-%m-%d') }}</td>
+                            <td><span class="badge bg-secondary">Expired</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No past promotions.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

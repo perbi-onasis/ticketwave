@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.name }} - TicketWave{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Event Details -->
+        <div class="col-lg-8">
+            <!-- Event Image -->
+            <div class="event-image-container mb-4">
+                <img src="{{ event.image_url or url_for('static', filename='images/default-event.jpg') }}" 
+                     alt="{{ event.name }}" class="img-fluid rounded">
+                {% if event.is_sold_out %}
+                <div class="sold-out-overlay">
+                    <span>SOLD OUT</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Event Information -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h1 class="card-title">{{ event.name }}</h1>
+                    <div class="event-meta mb-4">
+                        <p class="text-muted mb-2">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            {{ event.date.strftime('%A, %B %d, %Y at %I:%M %p') }}
+                            {% if event.end_date %}
+                            - {{ event.end_date.strftime('%A, %B %d, %Y at %I:%M %p') }}
+                            {% endif %}
+                        </p>
+                        <p class="text-muted mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            {{ event.venue }}
+                            <br>
+                            <span class="ms-4">{{ event.address }}, {{ event.city }}, {{ event.country }}</span>
+                        </p>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-user me-2"></i>
+                            Organized by {{ event.promoter }}
+                        </p>
+                    </div>
+
+                    <div class="event-description">
+                        <h4>About This Event</h4>
+                        {{ event.description|safe }}
+                    </div>
+
+                    {% if event.age_restriction %}
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Age Restriction: {{ event.age_restriction }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4>Additional Information</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Event Details</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-tag me-2"></i>
+                                    Category: {{ event.category|replace('_', ' ')|title }}
+                                </li>
+                                {% if event.max_capacity %}
+                                <li class="mb-2">
+                                    <i class="fas fa-users me-2"></i>
+                                    Capacity: {{ event.max_capacity }} people
+                                </li>
+                                {% endif %}
+                                {% if event.website_url %}
+                                <li class="mb-2">
+                                    <i class="fas fa-globe me-2"></i>
+                                    <a href="{{ event.website_url }}" target="_blank">Event Website</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Contact Information</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    {{ event.contact_email }}
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-phone me-2"></i>
+                                    {{ event.contact_phone }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticket Selection -->
+        <div class="col-lg-4">
+            <div class="card ticket-selection sticky-top">
+                <div class="card-header">
+                    <h4 class="mb-0">Select Tickets</h4>
+                </div>
+                <div class="card-body">
+                    {% if event.is_cancelled %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        This event has been cancelled
+                        {% if event.cancellation_reason %}
+                        <br>
+                        <small>{{ event.cancellation_reason }}</small>
+                        {% endif %}
+                    </div>
+                    {% elif event.is_sold_out %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        This event is sold out
+                    </div>
+                    {% elif not event.is_upcoming %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        This event has already taken place
+                    </div>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('tickets.purchase', event_id=event.id) }}" id="ticketForm">
+                        {% for ticket_type in event.ticket_types %}
+                        {% if ticket_type.is_available %}
+                        <div class="ticket-type-card mb-3">
+                            <h5>{{ ticket_type.name }}</h5>
+                            <p class="text-muted small">{{ ticket_type.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="price">GH₵{{ "%.2f"|format(ticket_type.price) }}</span>
+                                <div class="quantity-selector">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary quantity-btn" data-action="decrease">-</button>
+                                    <input type="number" name="quantity_{{ ticket_type.id }}" value="0" 
+                                           min="0" max="{{ ticket_type.max_per_order }}" class="form-control form-control-sm quantity-input">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary quantity-btn" data-action="increase">+</button>
+                                </div>
+                            </div>
+                            <div class="progress" style="height: 5px;">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ ticket_type.percentage_sold }}%"></div>
+                            </div>
+                            <small class="text-muted">
+                                {{ ticket_type.available }} tickets remaining
+                            </small>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if event.promotions %}
+                        <div class="mb-3">
+                            <label class="form-label">Promo Code</label>
+                            <input type="text" name="promo_code" class="form-control">
+                        </div>
+                        {% endif %}
+
+                        <div class="total-section mb-3 d-none">
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <span>Subtotal:</span>
+                                <span class="subtotal">GH₵0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between discount-row d-none">
+                                <span>Discount:</span>
+                                <span class="discount">-GH₵0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-bold">Total:</span>
+                                <span class="total fw-bold">GH₵0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" disabled>
+                                Get Tickets
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.event-image-container {
+    position: relative;
+    max-height: 400px;
+    overflow: hidden;
+}
+
+.event-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sold-out-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sold-out-overlay span {
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    transform: rotate(-30deg);
+}
+
+.sticky-top {
+    top: 20px;
+    z-index: 1000;
+}
+
+.ticket-type-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+}
+
+.progress-bar {
+    background-color: var(--primary-color);
+}
+
+.event-meta i {
+    color: var(--primary-color);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('ticketForm');
+    if (!form) return;
+
+    const quantityInputs = form.querySelectorAll('.quantity-input');
+    const submitButton = form.querySelector('button[type="submit"]');
+    const totalSection = form.querySelector('.total-section');
+    const subtotalSpan = form.querySelector('.subtotal');
+    const totalSpan = form.querySelector('.total');
+
+    function updateTotal() {
+        let total = 0;
+        let hasTickets = false;
+
+        quantityInputs.forEach(input => {
+            const quantity = parseInt(input.value);
+            const price = parseFloat(input.closest('.ticket-type-card').querySelector('.price').textContent.replace('GH₵', ''));
+            total += quantity * price;
+            if (quantity > 0) hasTickets = true;
+        });
+
+        subtotalSpan.textContent = `GH₵${total.toFixed(2)}`;
+        totalSpan.textContent = `GH₵${total.toFixed(2)}`;
+        totalSection.classList.toggle('d-none', !hasTickets);
+        submitButton.disabled = !hasTickets;
+    }
+
+    form.addEventListener('click', function(e) {
+        if (!e.target.classList.contains('quantity-btn')) return;
+
+        const button = e.target;
+        const input = button.parentElement.querySelector('.quantity-input');
+        const currentValue = parseInt(input.value);
+        const maxValue = parseInt(input.max);
+
+        if (button.dataset.action === 'increase' && currentValue < maxValue) {
+            input.value = currentValue + 1;
+        } else if (button.dataset.action === 'decrease' && currentValue > 0) {
+            input.value = currentValue - 1;
+        }
+
+        updateTotal();
+    });
+
+    quantityInputs.forEach(input => {
+        input.addEventListener('change', updateTotal);
+    });
+});
+</script>
+{% endblock %} 

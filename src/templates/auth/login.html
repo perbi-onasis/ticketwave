@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        {% if 'admin' in request.args.get('next', '') %}
+                            Login as Administrator
+                        {% else %}
+                            Login as Event Promoter
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next', '')) }}">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    {% if not 'admin' in request.args.get('next', '') %}
+                        <p class="mb-0">
+                            Don't have a promoter account? 
+                            <a href="{{ url_for('auth.register') }}">Register here</a>
+                        </p>
+                    {% endif %}
+                    <small class="text-muted">
+                        {% if 'create_event' in request.args.get('next', '') %}
+                            You are logging in to create an event.
+                        {% elif 'admin' in request.args.get('next', '') %}
+                            Administrator access only.
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="social-links">
+    <a href="https://facebook.com/ticketwave" target="_blank" class="me-3"><i class="fab fa-facebook"></i></a>
+    <a href="https://twitter.com/ticketwave" target="_blank" class="me-3"><i class="fab fa-twitter"></i></a>
+    <a href="https://instagram.com/ticketwave" target="_blank" class="me-3"><i class="fab fa-instagram"></i></a>
+    <a href="https://linkedin.com/company/ticketwave" target="_blank"><i class="fab fa-linkedin"></i></a>
+</div>
+{% endblock %} 

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Report - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Sales Report: {{ event.name }}</h2>
+        <a href="{{ url_for('promoter.dashboard') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Sales Summary -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <h3 class="text-success">₵{{ "%.2f"|format(total_revenue) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tickets Sold</h5>
+                    <h3>{{ tickets|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Average Price</h5>
+                    <h3>₵{{ "%.2f"|format(total_revenue / tickets|length if tickets else 0) }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales by Ticket Type -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Sales by Ticket Type</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Ticket Type</th>
+                            <th>Quantity Sold</th>
+                            <th>Revenue</th>
+                            <th>Promotions Used</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for type, stats in tickets_by_type.items() %}
+                        <tr>
+                            <td>{{ type }}</td>
+                            <td>{{ stats.count }}</td>
+                            <td>₵{{ "%.2f"|format(stats.revenue) }}</td>
+                            <td>{{ stats.promotions_used }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Sales -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Recent Sales</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Ticket #</th>
+                            <th>Type</th>
+                            <th>Customer</th>
+                            <th>Price Paid</th>
+                            <th>Promotion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.purchase_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ ticket.ticket_number }}</td>
+                            <td>{{ ticket.ticket_type.name }}</td>
+                            <td>{{ ticket.guest_name }}</td>
+                            <td>₵{{ "%.2f"|format(ticket.price_paid) }}</td>
+                            <td>
+                                {% if ticket.used_promotion %}
+                                {{ ticket.used_promotion.code }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Create Event{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Create New Event</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <!-- Basic Information -->
+                        <h4 class="mb-3">Basic Information</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Event Name *</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Category *</label>
+                                <select class="form-control" name="category" required>
+                                    {% for category in categories %}
+                                    <option value="{{ category }}">{{ category|replace('_', ' ')|title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Event Image</label>
+                            <input type="file" class="form-control" name="image" accept="image/*">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description *</label>
+                            <textarea class="form-control" name="description" rows="4" required></textarea>
+                        </div>
+
+                        <!-- Date and Time -->
+                        <h4 class="mb-3">Date and Time</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date and Time *</label>
+                                <input type="datetime-local" class="form-control" name="date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">End Date and Time</label>
+                                <input type="datetime-local" class="form-control" name="end_date">
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <h4 class="mb-3">Location</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Venue Name *</label>
+                                <input type="text" class="form-control" name="venue" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Address</label>
+                                <input type="text" class="form-control" name="address">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">City</label>
+                                <input type="text" class="form-control" name="city">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Country</label>
+                                <input type="text" class="form-control" name="country" value="Ghana">
+                            </div>
+                        </div>
+
+                        <!-- Capacity and Settings -->
+                        <h4 class="mb-3">Capacity and Settings</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Maximum Capacity</label>
+                                <input type="number" class="form-control" name="max_capacity" min="1">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Age Restriction</label>
+                                <input type="text" class="form-control" name="age_restriction" placeholder="e.g., 18+">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="is_private" id="is_private">
+                                <label class="form-check-label" for="is_private">Private Event</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Website URL</label>
+                            <input type="url" class="form-control" name="website_url">
+                        </div>
+
+                        <!-- Contact Information -->
+                        <h4 class="mb-3">Contact Information</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Email *</label>
+                                <input type="email" class="form-control" name="contact_email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Phone *</label>
+                                <input type="tel" class="form-control" name="contact_phone" required>
+                            </div>
+                        </div>
+
+                        <!-- Ticket Types -->
+                        <h4 class="mb-3">Ticket Types</h4>
+                        <div id="ticketTypes">
+                            <div class="ticket-type-entry mb-3">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Ticket Name</label>
+                                        <input type="text" class="form-control" name="ticket_types[]">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Price (₵)</label>
+                                        <input type="number" class="form-control" name="prices[]" min="0" step="0.01">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Quantity</label>
+                                        <input type="number" class="form-control" name="quantities[]" min="1">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Description</label>
+                                        <input type="text" class="form-control" name="ticket_descriptions[]">
+                                        <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeTicketType(this)">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary mb-3" onclick="addTicketType()">
+                            Add Another Ticket Type
+                        </button>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Create Event</button>
+                            <a href="{{ url_for('promoter.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addTicketType() {
+    const ticketTypesDiv = document.getElementById('ticketTypes');
+    const newEntry = document.createElement('div');
+    newEntry.className = 'ticket-type-entry mb-3';
+    newEntry.innerHTML = `
+        <div class="row">
+            <div class="col-md-3">
+                <label class="form-label">Ticket Name</label>
+                <input type="text" class="form-control" name="ticket_types[]">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Price (₵)</label>
+                <input type="number" class="form-control" name="prices[]" min="0" step="0.01">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Quantity</label>
+                <input type="number" class="form-control" name="quantities[]" min="1">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" name="ticket_descriptions[]">
+                <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeTicketType(this)">Remove</button>
+            </div>
+        </div>
+    `;
+    ticketTypesDiv.appendChild(newEntry);
+}
+
+function removeTicketType(button) {
+    button.closest('.ticket-type-entry').remove();
+}
+</script>
+{% endblock %} 

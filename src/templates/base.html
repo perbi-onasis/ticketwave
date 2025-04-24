@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ticketing System{% endblock %}</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+    <style>
+        :root {
+            --primary-color: #f28c38;
+            --dark-bg: #1A1A1D;
+            --light-bg: #f5f5f5;
+            --text-dark: #333;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #ddd;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background-color: var(--dark-bg) !important;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar-brand i {
+            color: var(--primary-color);
+        }
+
+        .nav-link {
+            color: white !important;
+            font-size: 1rem;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link i {
+            color: var(--primary-color);
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .btn-primary:hover {
+            background-color: #e07d29 !important;
+            border-color: #e07d29 !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        /* Footer styling */
+        .footer {
+            background-color: var(--dark-bg) !important;
+            color: white;
+            margin-top: auto;
+        }
+
+        .footer .list-unstyled li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer .list-unstyled li a i {
+            width: 20px;
+            transition: transform 0.3s ease;
+            color: var(--primary-color);
+        }
+        
+        .footer .list-unstyled li a:hover i {
+            transform: scale(1.2);
+        }
+        
+        .footer .list-unstyled li a:hover {
+            color: var(--primary-color) !important;
+        }
+
+        /* Link styling */
+        .section-link {
+            color: var(--primary-color) !important;
+        }
+
+        /* Card styling */
+        .card {
+            background-color: white;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            background-color: var(--dark-bg);
+            color: white;
+        }
+
+        /* Alert styling */
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .alert-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Badge styling */
+        .badge {
+            background-color: var(--primary-color) !important;
+        }
+
+        /* Flash message styling with slideshow */
+        .flash-messages-container {
+            position: relative;
+            width: 100%;
+            height: 200px; /* Set fixed height */
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.7);
+            margin-bottom: 1rem;
+        }
+
+        .slideshow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .slideshow img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .alert {
+            position: relative;
+            z-index: 1;
+            background-color: rgba(0, 0, 0, 0.7) !important;
+            color: white !important;
+            border: none;
+            margin: 0;
+            padding: 1.5rem;
+            text-align: center;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.8) !important;
+        }
+
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.8) !important;
+        }
+
+        /* Center events header in footer */
+        .events-section {
+            text-align: center;
+        }
+
+        .events-section h5 {
+            display: inline-block;
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .events-section h5:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        /* Footer section styling */
+        .footer-section {
+            text-align: center;
+        }
+
+        .footer-section h5 {
+            display: inline-block;
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .footer-section h5:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        .footer-section .list-unstyled {
+            text-align: left;
+        }
+
+        .footer-section .social-links,
+        .footer-section .payment-methods {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .footer-section h6 {
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .create-event-btn {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            margin-left: 1rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 20px;
+        }
+        
+        .create-event-btn:hover {
+            background-color: #e07420 !important;
+            border-color: #e07420 !important;
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+        }
+
+        .flash-container {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+        }
+
+        .alert {
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+
+        .alert-danger {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+
+        .alert-warning {
+            background-color: #ffc107;
+            color: #000;
+            border: none;
+        }
+
+        .alert-info {
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+        }
+
+        .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .dropdown-menu {
+            background-color: var(--dark-bg);
+            border: 1px solid var(--primary-color);
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-item {
+            color: white;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .dropdown-divider {
+            border-top: 1px solid var(--primary-color);
+            opacity: 0.2;
+        }
+
+        .create-event-btn.dropdown-toggle::after {
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .dropdown-header {
+            color: var(--primary-color);
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+        }
+
+        .dropdown-menu {
+            padding: 0.5rem 0;
+            border: none;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .dropdown-item i {
+            color: var(--primary-color);
+        }
+
+        .dropdown-item:hover i {
+            color: white;
+        }
+
+        .create-event-btn {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .create-event-btn:hover {
+            background-color: #e07420;
+            border-color: #e07420;
+        }
+
+        .creator-options {
+            min-width: 280px;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: white;
+        }
+
+        .creator-options .dropdown-header {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 0.5rem 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .creator-options .dropdown-item {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            color: var(--text-dark);
+        }
+
+        .creator-options .dropdown-item small {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+
+        .creator-options .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .creator-options .dropdown-item:hover small {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .creator-options .dropdown-item:hover i {
+            color: white;
+        }
+
+        .creator-options .dropdown-divider {
+            margin: 0.5rem 0;
+        }
+
+        .create-event-btn {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .create-event-btn:hover {
+            background-color: #e07420;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                <i class="fas fa-ticket-alt me-2"></i>TicketWave
+            </a>
+            
+            <!-- Toggler for mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Navbar content -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.events') }}">
+                            <i class="fas fa-calendar me-1"></i> Browse Events
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                                    <i class="fas fa-tachometer-alt me-1"></i> Admin Dashboard
+                                </a>
+                            </li>
+                        {% elif current_user.is_promoter %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('promoter.dashboard') }}">
+                                    <i class="fas fa-tachometer-alt me-1"></i> Promoter Dashboard
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('user.dashboard') }}">
+                                    <i class="fas fa-user me-1"></i> My Dashboard
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                {% if current_user.is_admin %}
+                                    <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-2"></i> Admin Dashboard
+                                    </a></li>
+                                {% elif current_user.is_promoter %}
+                                    <li><a class="dropdown-item" href="{{ url_for('promoter.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-2"></i> Promoter Dashboard
+                                    </a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item" href="{{ url_for('user.dashboard') }}">
+                                        <i class="fas fa-user me-2"></i> My Dashboard
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('user.my_tickets') }}">
+                                        <i class="fas fa-ticket-alt me-2"></i> My Tickets
+                                    </a></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{{ url_for('auth.edit_profile') }}">
+                                    <i class="fas fa-user-edit me-2"></i> Edit Profile
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item dropdown">
+                            <button class="nav-link btn btn-primary create-event-btn dropdown-toggle" 
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-plus"></i> Create Event
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end creator-options">
+                                <li>
+                                    <h6 class="dropdown-header">Choose an Option</h6>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('auth.login', next=url_for('promoter.create_event')) }}">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Login as Promoter
+                                        <small class="d-block text-muted">Already have a promoter account?</small>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('auth.login', next=url_for('admin.dashboard')) }}">
+                                        <i class="fas fa-user-shield me-2"></i>Login as Admin
+                                        <small class="d-block text-muted">Administrator access only</small>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('auth.register') }}">
+                                        <i class="fas fa-user-plus me-2"></i>Register as Promoter
+                                        <small class="d-block text-muted">Create a new promoter account</small>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <div class="container d-flex justify-content-between align-items-center">
+                            <span>
+                                {% if category == 'success' %}
+                                    <i class="fas fa-check-circle me-2"></i>
+                                {% elif category == 'danger' %}
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                {% elif category == 'warning' %}
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                {% else %}
+                                    <i class="fas fa-info-circle me-2"></i>
+                                {% endif %}
+                                {{ message }}
+                            </span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-4" style="margin-bottom: 2rem;">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-4 bg-dark text-light">
+        <div class="container">
+            <div class="row">
+                <!-- Quick Links -->
+                <div class="col-md-3 mb-3 footer-section">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main.index') }}" class="text-light text-decoration-none">
+                            <i class="fas fa-home me-2"></i>Home
+                        </a></li>
+                        <li><a href="{{ url_for('main.events') }}" class="text-light text-decoration-none">
+                            <i class="fas fa-calendar me-2"></i>Events
+                        </a></li>
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.is_promoter %}
+                                <li><a href="{{ url_for('promoter.dashboard') }}" class="text-light text-decoration-none">
+                                    <i class="fas fa-user me-2"></i>Promoter Dashboard
+                                </a></li>
+                            {% endif %}
+                            {% if not current_user.is_admin and not current_user.is_promoter %}
+                                <li><a href="{{ url_for('user.my_tickets') }}" class="text-light text-decoration-none">
+                                    <i class="fas fa-ticket-alt me-2"></i>My Tickets
+                                </a></li>
+                            {% endif %}
+                        {% endif %}
+                        <li><a href="{{ url_for('main.terms') }}" class="text-light text-decoration-none">
+                            <i class="fas fa-file-alt me-2"></i>Terms & Conditions
+                        </a></li>
+                        <li><a href="{{ url_for('main.privacy') }}" class="text-light text-decoration-none">
+                            <i class="fas fa-shield-alt me-2"></i>Privacy Policy
+                        </a></li>
+                        <li><a href="{{ url_for('main.team') }}" class="text-light text-decoration-none">
+                            <i class="fas fa-users me-2"></i>Development Team
+                        </a></li>
+                    </ul>
+                </div>
+
+                <!-- Events & Categories -->
+                <div class="col-md-6 mb-3 footer-section">
+                    <h5>Events</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <ul class="list-unstyled">
+                                <li><a href="{{ url_for('main.events') }}" class="text-light text-decoration-none">
+                                    <i class="fas fa-calendar me-2" style="color: #f28c38;"></i>All Events
+                                </a></li>
+                                {% for category in categories[:8] %}  <!-- First 8 categories -->
+                                <li><a href="{{ url_for('main.events') }}#{{ category }}" class="text-light text-decoration-none">
+                                    <i class="{{ category_icons[category] }} me-2" style="color: #f28c38;"></i>
+                                    {{ category|replace('_', ' ')|title }}
+                                </a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                    <ul class="list-unstyled">
+                                {% for category in categories[8:] %}  <!-- Remaining categories -->
+                                <li><a href="{{ url_for('main.events') }}#{{ category }}" class="text-light text-decoration-none">
+                                    <i class="{{ category_icons[category] }} me-2" style="color: #f28c38;"></i>
+                                    {{ category|replace('_', ' ')|title }}
+                                </a></li>
+                                {% endfor %}
+                    </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Info & Social Media -->
+                <div class="col-md-3 mb-3 footer-section">
+                    <h5 class="text-center">Contact Us</h5>
+                    <ul class="list-centered list-unstyled">
+                        <li><i class="fas fa-phone"></i> +233 55 571 0688 | +233 20 997 1918</li>
+                        <li><i class="fas fa-envelope"></i> support@ticketwave.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Takoradi, Ghana</li>
+                    </ul>
+                    <div class="text-center">
+                        <h5>Follow Us</h5>
+                        <div class="social-links">
+                            <a href="#" class="me-3"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                        </div>
+                        <h5 class="mt-4">Payment Methods</h5>
+                    <div class="payment-methods">
+                        <i class="fab fa-cc-visa me-2"></i>
+                        <i class="fab fa-cc-mastercard me-2"></i>
+                            <i class="fab fa-cc-paypal"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <hr class="bg-light">
+                    <div class="copyright-section text-center">
+                        <p class="text-light mb-2">
+                            © {{ current_year }} TicketWave. All rights reserved.
+                        </p>
+                        <!-- <p class="text-muted small mb-0">
+                            Developed by <a href="https://github.com/emmanuelyelisomah" target="_blank" class="text-decoration-none" style="color: var(--primary-color);">Emmanuel Yelisomah</a> |
+                            TicketWave is a registered trademark. All content, including text, graphics, and event information, is protected by copyright law.
+                            Unauthorized use or reproduction is strictly prohibited.
+                        </p> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Slideshow functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.slideshow img');
+            let currentImage = 0;
+
+            function showNextImage() {
+                // Hide all images
+                images.forEach(img => img.style.opacity = '0');
+                
+                // Show next image
+                images[currentImage].style.opacity = '1';
+                
+                // Update counter
+                currentImage = (currentImage + 1) % images.length;
+            }
+
+            // Show first image immediately
+            if (images.length > 0) {
+                showNextImage();
+                // Start slideshow
+                setInterval(showNextImage, 3000);
+            }
+        });
+
+        // Footer link functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click tracking for footer links
+            const footerLinks = document.querySelectorAll('.footer a');
+            footerLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // For external links (social media)
+                    if (this.getAttribute('href') === '#') {
+                        e.preventDefault();
+                        alert('Social media links will be activated soon!');
+                    }
+                });
+            });
+        });
+
+        // Auto-dismiss flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+
+        // Add this to your existing scripts section
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle smooth scrolling for category links
+            document.querySelectorAll('a[href*="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href.includes('#')) {
+                        const categoryId = href.split('#')[1];
+                        const element = document.getElementById(categoryId);
+                        if (element) {
+                            e.preventDefault();
+                            element.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

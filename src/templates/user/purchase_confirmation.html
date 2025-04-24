@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Purchase Confirmation{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                    <h2 class="card-title">Thank You for Your Purchase!</h2>
+                    <p class="card-text">Your tickets have been successfully generated. You can view them below or check your email for more details.</p>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Purchase Details</h5>
+                </div>
+                <div class="card-body">
+                    {% for ticket in tickets %}
+                    <div class="ticket-details mb-3 p-3 border rounded">
+                        <h6>Ticket #{{ ticket.ticket_number }}</h6>
+                        <p class="mb-2">
+                            <strong>Event:</strong> {{ ticket.event.name }}<br>
+                            <strong>Date:</strong> {{ ticket.event.date.strftime('%B %d, %Y at %I:%M %p') }}<br>
+                            <strong>Venue:</strong> {{ ticket.event.venue }}<br>
+                            <strong>Ticket Type:</strong> {{ ticket.ticket_type.name }}<br>
+                            <strong>Price Paid:</strong> ₵{{ "%.2f"|format(ticket.price_paid) }}
+                            {% if ticket.used_promotion %}
+                            <br><small class="text-success">
+                                Promotion applied: {{ ticket.used_promotion.code }}
+                                ({{ ticket.used_promotion.discount_percent }}% off)
+                            </small>
+                            {% endif %}
+                        </p>
+                        <div class="text-center">
+                            <h6>QR Code</h6>
+                            <img src="data:image/png;base64,{{ ticket.qr_code }}" alt="QR Code for Ticket" class="img-fluid mt-2" style="max-width: 200px;">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('user.my_tickets') }}" class="btn btn-primary">View My Tickets</a>
+                <a href="{{ url_for('user.events') }}" class="btn btn-secondary">Browse More Events</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

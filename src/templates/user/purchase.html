@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Purchase Tickets</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('user.purchase_tickets', event_id=event.id) }}">
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+
+                        <h5 class="mt-4">Selected Tickets</h5>
+                        {% for item in cart.items %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6>{{ item.ticket_type.name }}</h6>
+                                <p class="mb-1">Quantity: {{ item.quantity }}</p>
+                                <p class="mb-1">Price: ${{ "%.2f"|format(item.ticket_type.price) }} each</p>
+                                <p class="mb-0">Subtotal: ${{ "%.2f"|format(item.ticket_type.price * item.quantity) }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <h5 class="mb-0">Total: ${{ "%.2f"|format(total_price) }}</h5>
+                            <button type="submit" class="btn btn-primary">Complete Purchase</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Event Details</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ event.name }}</h6>
+                    <p class="mb-1">
+                        <i class="fas fa-calendar"></i> 
+                        {{ event.date.strftime('%B %d, %Y') }}
+                    </p>
+                    <p class="mb-1">
+                        <i class="fas fa-clock"></i>
+                        {{ event.date.strftime('%I:%M %p') }}
+                    </p>
+                    <p class="mb-0">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ event.venue }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

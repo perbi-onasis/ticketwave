@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card ticket-card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Event Ticket</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="card-title">{{ ticket.event.name }}</h5>
+                            <p class="card-text">
+                                <strong>Ticket Number:</strong> {{ ticket.ticket_number }}<br>
+                                <strong>Event Date:</strong> {{ ticket.event.date.strftime('%B %d, %Y %H:%M') }}<br>
+                                <strong>Venue:</strong> {{ ticket.event.venue }}<br>
+                                <strong>Ticket Type:</strong> {{ ticket.ticket_type.name }}<br>
+                                <strong>Price Paid:</strong> ${{ "%.2f"|format(ticket.price_paid) }}<br>
+                                <strong>Status:</strong> 
+                                <span class="badge bg-{{ 'success' if ticket.status == 'active' else 'secondary' }}">
+                                    {{ ticket.status }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            {% if ticket.qr_code %}
+                            <img src="data:image/png;base64,{{ ticket.qr_code }}" 
+                                 alt="Ticket QR Code" class="img-fluid">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('user.download_ticket', ticket_id=ticket.id) }}" 
+                       class="btn btn-primary">
+                        <i class="fas fa-download"></i> Download Ticket
+                    </a>
+                    <a href="{{ url_for('user.dashboard') }}" 
+                       class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

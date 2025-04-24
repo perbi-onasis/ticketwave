@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Events - TicketWave{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form class="d-flex" method="GET">
+                <input type="search" name="q" class="form-control me-2" placeholder="Search events..." value="{{ request.args.get('q', '') }}">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" name="sort" onchange="this.form.submit()">
+                <option value="date" {% if sort == 'date' %}selected{% endif %}>Date: Soonest First</option>
+                <option value="-date" {% if sort == '-date' %}selected{% endif %}>Date: Latest First</option>
+                <option value="price" {% if sort == 'price' %}selected{% endif %}>Price: Low to High</option>
+                <option value="-price" {% if sort == '-price' %}selected{% endif %}>Price: High to Low</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="category-filter mb-4">
+        <div class="d-flex flex-wrap">
+            <a href="{{ url_for('events.list') }}" class="btn {% if not category %}btn-primary{% else %}btn-outline-primary{% endif %} me-2 mb-2">
+                All Events
+            </a>
+            {% for cat in categories %}
+            <a href="{{ url_for('events.list', category=cat) }}" 
+               class="btn {% if category == cat %}btn-primary{% else %}btn-outline-primary{% endif %} me-2 mb-2">
+                {{ cat|replace('_', ' ')|title }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Featured Events -->
+    {% if featured_events %}
+    <section class="mb-5">
+        <h2 class="mb-4">Featured Events</h2>
+        <div class="row">
+            {% for event in featured_events %}
+            <div class="col-md-4 mb-4">
+                <div class="card event-card h-100">
+                    <div class="position-relative">
+                        <img src="{{ event.image_url or url_for('static', filename='images/default-event.jpg') }}" 
+                             class="card-img-top" alt="{{ event.name }}">
+                        {% if event.is_sold_out %}
+                        <div class="sold-out-badge">Sold Out</div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.name }}</h5>
+                        <p class="card-text text-muted">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            {{ event.date.strftime('%B %d, %Y at %I:%M %p') }}
+                        </p>
+                        <p class="card-text text-muted">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            {{ event.venue }}, {{ event.city }}
+                        </p>
+                        <p class="card-text">
+                            {% if event.lowest_price %}
+                            <span class="text-primary fw-bold">From GH₵{{ "%.2f"|format(event.lowest_price) }}</span>
+                            {% endif %}
+                        </p>
+                        <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-primary stretched-link">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Event Listings -->
+    <section>
+        <h2 class="mb-4">{% if category %}{{ category|replace('_', ' ')|title }} {% endif %}Events</h2>
+        {% if events %}
+        <div class="row">
+            {% for event in events %}
+            <div class="col-md-4 mb-4">
+                <div class="card event-card h-100">
+                    <div class="position-relative">
+                        <img src="{{ event.image_url or url_for('static', filename='images/default-event.jpg') }}" 
+                             class="card-img-top" alt="{{ event.name }}">
+                        {% if event.is_sold_out %}
+                        <div class="sold-out-badge">Sold Out</div>
+                        {% endif %}
+                        <div class="category-badge">{{ event.category|replace('_', ' ')|title }}</div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.name }}</h5>
+                        <p class="card-text text-muted">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            {{ event.date.strftime('%B %d, %Y at %I:%M %p') }}
+                        </p>
+                        <p class="card-text text-muted">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            {{ event.venue }}, {{ event.city }}
+                        </p>
+                        <p class="card-text">
+                            {% if event.lowest_price %}
+                            <span class="text-primary fw-bold">From GH₵{{ "%.2f"|format(event.lowest_price) }}</span>
+                            {% endif %}
+                        </p>
+                        <div class="d-grid">
+                            <a href="{{ url_for('events.detail', event_id=event.id) }}" class="btn btn-primary">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% for page in pagination.iter_pages() %}
+                    {% if page %}
+                        <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('events.list', page=page, **request.args) }}">{{ page }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+            <h3>No events found</h3>
+            <p class="text-muted">Try adjusting your search or filters to find more events.</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+<style>
+.event-card {
+    transition: transform 0.2s;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.event-card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.sold-out-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(220, 53, 69, 0.9);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.category-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.pagination .page-link {
+    color: var(--primary-color);
+}
+
+.pagination .active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+</style>
+{% endblock %} 

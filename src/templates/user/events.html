@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Events{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Search and Filter Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="q" class="form-control" placeholder="Search events..." value="{{ search or '' }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if cat == current_category %}selected{% endif %}>
+                            {{ cat|replace('_', ' ')|title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="sort" class="form-select">
+                        <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Date</option>
+                        <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if current_category %}
+        <!-- Category-specific Events -->
+        <h2 class="mb-4">{{ current_category|replace('_', ' ')|title }} Events</h2>
+        {% if events %}
+        <div class="row g-4">
+            {% for event in events %}
+            <div class="col-md-4">
+                <div class="event-card">
+                    {% if event.image_url %}
+                        <img src="{{ event.image_url }}" class="event-image" alt="{{ event.name }}">
+                    {% else %}
+                        <div class="event-image-placeholder">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                    {% endif %}
+                    <div class="event-content">
+                        <span class="event-category">{{ event.category|replace('_', ' ')|title }}</span>
+                        <h3 class="event-title">{{ event.name }}</h3>
+                        <div class="event-details">
+                            <span><i class="fas fa-calendar-alt"></i> {{ event.date.strftime('%B %d, %Y') }}</span>
+                            <span><i class="fas fa-map-marker-alt"></i> {{ event.venue }}</span>
+                            {% if event.lowest_price %}
+                                <span><i class="fas fa-tag"></i> From ₵{{ "%.2f"|format(event.lowest_price) }}</span>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('main.event_detail', event_id=event.id) }}" class="btn btn-primary btn-block">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center">No events found in this category.</p>
+        {% endif %}
+    {% else %}
+        <!-- Events by Category -->
+        {% for category, events in events_by_category.items() %}
+        <div class="mb-5" id="{{ category }}">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>{{ category|replace('_', ' ')|title }}</h2>
+                <a href="{{ url_for('main.events', category=category) }}" class="btn btn-outline-primary">
+                    View All {{ category|replace('_', ' ')|title }} Events
+                </a>
+            </div>
+            <div class="row g-4">
+                {% for event in events %}
+                <div class="col-md-4">
+                    <div class="event-card">
+                        {% if event.image_url %}
+                            <img src="{{ event.image_url }}" class="event-image" alt="{{ event.name }}">
+                        {% else %}
+                            <div class="event-image-placeholder">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                        {% endif %}
+                        <div class="event-content">
+                            <span class="event-category">{{ event.category|replace('_', ' ')|title }}</span>
+                            <h3 class="event-title">{{ event.name }}</h3>
+                            <div class="event-details">
+                                <span><i class="fas fa-calendar-alt"></i> {{ event.date.strftime('%B %d, %Y') }}</span>
+                                <span><i class="fas fa-map-marker-alt"></i> {{ event.venue }}</span>
+                                {% if event.lowest_price %}
+                                    <span><i class="fas fa-tag"></i> From ₵{{ "%.2f"|format(event.lowest_price) }}</span>
+                                {% endif %}
+                            </div>
+                            <a href="{{ url_for('main.event_detail', event_id=event.id) }}" class="btn btn-primary btn-block">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .event-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        height: 100%;
+    }
+
+    .event-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .event-image, .event-image-placeholder {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        background: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .event-image-placeholder i {
+        font-size: 3rem;
+        color: #ccc;
+    }
+
+    .event-content {
+        padding: 1.5rem;
+    }
+
+    .event-category {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .event-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+    }
+
+    .event-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    .event-details span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-block {
+        width: 100%;
+    }
+</style>
+{% endblock %} 

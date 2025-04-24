@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Reports{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Sales Reports</h2>
+        
+        <!-- Date Range Filter -->
+        <form class="d-flex gap-2" method="GET">
+            <input type="date" class="form-control" name="from_date" 
+                   value="{{ from_date }}" placeholder="From Date">
+            <input type="date" class="form-control" name="to_date" 
+                   value="{{ to_date }}" placeholder="To Date">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <h3 class="text-success">₵{{ "%.2f"|format(stats.total_revenue) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Tickets Sold</h5>
+                    <h3>{{ stats.total_tickets }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Average Price</h5>
+                    <h3>₵{{ "%.2f"|format(stats.avg_ticket_price) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Promotions Used</h5>
+                    <h3>{{ stats.promotions_used }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales by Event -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Sales by Event</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Event Name</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Tickets Sold</th>
+                            <th>Revenue</th>
+                            <th>Avg. Price</th>
+                            <th>Promotions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event_name, sales in event_sales.items() %}
+                        <tr>
+                            <td>{{ event_name }}</td>
+                            <td>{{ sales.date }}</td>
+                            <td><span class="badge bg-{{ 'success' if sales.status == 'approved' else 'warning' }}">
+                                {{ sales.status }}
+                            </span></td>
+                            <td>{{ sales.count }}</td>
+                            <td>₵{{ "%.2f"|format(sales.total) }}</td>
+                            <td>₵{{ "%.2f"|format(sales.avg_price) }}</td>
+                            <td>{{ sales.promotions_used }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Sales Chart -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Monthly Sales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Tickets</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for month, data in stats.sales_by_month.items() %}
+                                <tr>
+                                    <td>{{ month }}</td>
+                                    <td>{{ data.count }}</td>
+                                    <td>₵{{ "%.2f"|format(data.revenue) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Sales by Payment Method</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Transactions</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for method, data in stats.sales_by_payment_method.items() %}
+                                <tr>
+                                    <td>{{ method|title }}</td>
+                                    <td>{{ data.count }}</td>
+                                    <td>₵{{ "%.2f"|format(data.revenue) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

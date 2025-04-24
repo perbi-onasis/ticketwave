@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Terms & Conditions - TicketWave{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Terms & Conditions</h1>
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h5 mb-4">1. Acceptance of Terms</h2>
+                    <p>By accessing and using TicketWave, you accept and agree to be bound by the terms and provision of this agreement.</p>
+
+                    <h2 class="h5 mb-4">2. Event Tickets</h2>
+                    <p>2.1. All tickets purchased through TicketWave are subject to availability.</p>
+                    <p>2.2. Tickets are non-refundable unless an event is cancelled.</p>
+                    <p>2.3. TicketWave reserves the right to cancel tickets if fraudulent activity is suspected.</p>
+
+                    <h2 class="h5 mb-4">3. Promoter Responsibilities</h2>
+                    <p>3.1. Promoters must provide accurate event information.</p>
+                    <p>3.2. Promoters are responsible for ensuring their events comply with local laws and regulations.</p>
+                    <p>3.3. Promoters must honor all tickets sold through the platform.</p>
+
+                    <h2 class="h5 mb-4">4. User Conduct</h2>
+                    <p>4.1. Users agree not to use the service for any unlawful purpose.</p>
+                    <p>4.2. Users must not attempt to manipulate ticket sales or pricing.</p>
+                    <p>4.3. Users must not share their account credentials.</p>
+
+                    <h2 class="h5 mb-4">5. Payment and Fees</h2>
+                    <p>5.1. All payments are processed securely through our payment partners.</p>
+                    <p>5.2. Service fees are non-refundable.</p>
+                    <p>5.3. All prices are in Ghana Cedis (GHS) unless otherwise stated.</p>
+
+                    <h2 class="h5 mb-4">6. Intellectual Property</h2>
+                    <p>6.1. All content on TicketWave is protected by copyright and other intellectual property rights.</p>
+                    <p>6.2. Users may not reproduce, distribute, or create derivative works without permission.</p>
+
+                    <h2 class="h5 mb-4">7. Privacy</h2>
+                    <p>7.1. User privacy is governed by our <a href="{{ url_for('main.privacy') }}">Privacy Policy</a>.</p>
+                    <p>7.2. Users agree to the collection and use of information as described in the Privacy Policy.</p>
+
+                    <h2 class="h5 mb-4">8. Limitation of Liability</h2>
+                    <p>8.1. TicketWave is not liable for any direct, indirect, incidental, or consequential damages.</p>
+                    <p>8.2. TicketWave is not responsible for the conduct of event organizers or attendees.</p>
+
+                    <h2 class="h5 mb-4">9. Changes to Terms</h2>
+                    <p>9.1. TicketWave reserves the right to modify these terms at any time.</p>
+                    <p>9.2. Users will be notified of significant changes to these terms.</p>
+
+                    <h2 class="h5 mb-4">10. Contact Information</h2>
+                    <p>For questions about these Terms & Conditions, please contact us at:</p>
+                    <ul>
+                        <li>Email: support@ticketwave.com</li>
+                        <li>Phone: +233 20 123 4567</li>
+                        <li>Address: 123 Independence Ave, Accra, Ghana</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

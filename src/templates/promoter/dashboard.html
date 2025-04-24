@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Promoter Dashboard{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2>Promoter Dashboard</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Overall Statistics</h5>
+                    <p class="card-text">
+                        <strong>Total Revenue:</strong> ₵{{ "%.2f"|format(total_sales) }}<br>
+                        <strong>Total Tickets Sold:</strong> {{ total_tickets }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="d-flex justify-content-end">
+                <a href="{{ url_for('promoter.create_event') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create New Event
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <h3>Your Events</h3>
+    {% for event in events %}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">{{ event.name }}</h4>
+            <span class="badge {% if event.status == 'approved' %}bg-success{% else %}bg-warning{% endif %}">
+                {{ event.status|title }}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Event Details</h5>
+                    <p>
+                        <strong>Date:</strong> {{ event.date.strftime('%B %d, %Y %I:%M %p') }}<br>
+                        <strong>Venue:</strong> {{ event.venue }}<br>
+                        <strong>Total Revenue:</strong> ₵{{ "%.2f"|format(event_stats[event.id].revenue) }}<br>
+                        <strong>Total Tickets Sold:</strong> {{ event_stats[event.id].tickets_sold }}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Ticket Types</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Sold</th>
+                                    <th>Available</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket_type in event_stats[event.id].ticket_types.values() %}
+                                <tr>
+                                    <td>{{ ticket_type.name }}</td>
+                                    <td>{{ ticket_type.sold }}/{{ ticket_type.total }}</td>
+                                    <td>{{ ticket_type.available }}</td>
+                                    <td>₵{{ "%.2f"|format(ticket_type.revenue) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <a href="{{ url_for('promoter.manage_tickets', event_id=event.id) }}" 
+                   class="btn btn-outline-primary btn-sm me-2">
+                    <i class="fas fa-ticket-alt"></i> Manage Tickets
+                </a>
+                <a href="{{ url_for('promoter.manage_promotions', event_id=event.id) }}" 
+                   class="btn btn-outline-info btn-sm">
+                    <i class="fas fa-percent"></i> Manage Promotions
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Quick Actions</h5>
+                <div class="list-group">
+                    <a href="{{ url_for('auth.edit_profile') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user-edit"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
