@@ -21,3 +21,5 @@ Pillow==10.2.0
 # Security
 bcrypt==4.1.2
 PyJWT==2.8.0
+
+gunicorn==23.0.0
