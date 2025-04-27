@@ -25,8 +25,8 @@ class Config:
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
     
     # Paystack settings
-    PAYSTACK_SECRET_KEY = 'sk_test_b76d102e97b05054ba3037a74d855d9826d139df'
-    PAYSTACK_PUBLIC_KEY = 'pk_test_b76d102e97b05054ba3037a74d855d9826d139df'
+    PAYSTACK_SECRET_KEY = os.environ.get('PAYSTACK_SECRET_KEY')
+    PAYSTACK_PUBLIC_KEY = os.environ.get('PAYSTACK_PUBLIC_KEY')
     
     # Add CSRF protection
     WTF_CSRF_ENABLED = True
