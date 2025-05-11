@@ -1,0 +1,14 @@
+[build]
+  command = "pip install -r requirements.txt" # Or your build command
+  publish = "main" # e.g., "public"
+
+[[plugins]]
+  package = "netlify-plugin-apt"
+
+[plugins.inputs]
+  install_packages = [
+    "build-essential",
+    "libjpeg-dev",
+    "zlib1g-dev",
+    "libfreetype6-dev"
+  ]
