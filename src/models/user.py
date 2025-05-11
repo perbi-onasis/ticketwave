@@ -17,6 +17,9 @@ class User(UserMixin, db.Model):
     is_verified = db.Column(db.Boolean, default=False)
     verification_token = db.Column(db.String(100), unique=True, nullable=True)
 
+    reset_token = db.Column(db.String(100), unique=True, nullable=True)
+    reset_token_expiry = db.Column(db.DateTime, nullable=True)
+
     # Define relationships
     events = db.relationship('Event', 
                            backref='promoter_user',
@@ -51,3 +54,8 @@ class User(UserMixin, db.Model):
     def generate_verification_token(self):
         self.verification_token = secrets.token_urlsafe(32)
         return self.verification_token
+
+    def generate_reset_token(self):
+        self.reset_token = secrets.token_urlsafe(32)
+        self.reset_token_expiry = datetime.utcnow() + timedelta(hours=1)
+        return self.reset_token

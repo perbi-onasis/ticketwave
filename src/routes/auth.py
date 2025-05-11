@@ -106,6 +106,7 @@ def register():
                          categories=EVENT_CATEGORIES,
                          category_icons=CATEGORY_ICONS)
 
+    
 @auth.route('/verify/<token>')
 def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
@@ -170,3 +171,56 @@ def edit_profile():
             print(f"Profile update error: {str(e)}")
             
     return render_template('auth/edit_profile.html') 
+
+# src/routes/auth.py
+from datetime import datetime, timedelta
+
+@auth.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+        
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            token = user.generate_reset_token()
+            db.session.commit()
+            send_password_reset_email(user.email, token)
+            flash('Password reset instructions have been sent to your email.', 'info')
+            return redirect(url_for('auth.login'))
+            
+        flash('Email not found.', 'danger')
+        return redirect(url_for('auth.forgot_password'))
+        
+    return render_template('auth/forgot_password.html')
+
+@auth.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+        
+    user = User.query.filter_by(reset_token=token).first()
+    
+    if not user or user.reset_token_expiry < datetime.utcnow():
+        flash('Invalid or expired password reset link.', 'danger')
+        return redirect(url_for('auth.forgot_password'))
+        
+    if request.method == 'POST':
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return redirect(url_for('auth.reset_password', token=token))
+            
+        user.set_password(password)
+        user.reset_token = None
+        user.reset_token_expiry = None
+        db.session.commit()
+        
+        flash('Your password has been reset. You can now login.', 'success')
+        return redirect(url_for('auth.login'))
+        
+    return render_template('auth/reset_password.html')
