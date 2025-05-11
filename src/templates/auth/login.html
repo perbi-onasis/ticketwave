@@ -52,8 +52,10 @@
                     </small>
                 </div>
                     <p class="mb-0">
-                       Forgot your password? 
-                        <a href="{{ url_for('auth.forgot_password') }}">Reset</a>
+                       You forgot your critical key, No problem
+                        <div class="text-end mt-1">
+                            <a href="{{ url_for('auth.forgot_password') }}" class="text-decoration-none">Reset Password?</a>
+                        </div>
                      </p>
             </div>
         </div>
